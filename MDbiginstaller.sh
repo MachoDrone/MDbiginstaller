@@ -403,7 +403,7 @@ sudo nvidia-ctk runtime configure --runtime=docker
 
 sudo systemctl restart docker
 
-sudo reboot
+# sudo reboot
 
 #echo ********************************
 #echo "complete, now do a sudo reboot"

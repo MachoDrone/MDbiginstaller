@@ -1,5 +1,5 @@
 #!/bin/bash
-echo "v4.21pm"
+echo "v4.24pm"
 # Error handling and logging
 set -e
 RED='\033[1;31m'
@@ -28,10 +28,10 @@ if [ "$PWD" != "$HOME" ]; then
 fi
 
 # ASCII arrow before first sudo command
-echo -e "          ___"
-echo -e "         |   |"
-echo -e "       _ |   |_"
-echo -e "       \\     /"
+echo -e "          __"
+echo -e "         |  |"
+echo -e "        _|  |_"
+echo -e "        \\    /"
 echo -e "         \\  /"
 echo -e "          \\/"
 

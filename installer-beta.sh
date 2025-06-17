@@ -1,5 +1,5 @@
 #!/bin/bash
-echo "v4.24pm"
+echo "v6.12pm"
 # Error handling and logging
 set -e
 RED='\033[1;31m'
@@ -28,12 +28,13 @@ if [ "$PWD" != "$HOME" ]; then
 fi
 
 # ASCII arrow before first sudo command
-echo -e "          __"
-echo -e "         |  |"
-echo -e "        _|  |_"
-echo -e "        \\    /"
-echo -e "         \\  /"
-echo -e "          \\/"
+echo -e "            /\\"
+echo -e "           /   \\"
+echo -e "          /      \\"
+echo -e "         /         \\"
+echo -e "        ~~~~|   |~~~~\\"
+echo -e "            |   |"
+echo -e "            |___|"
 
 # Capture username at the very beginning
 username=$(echo $USER)

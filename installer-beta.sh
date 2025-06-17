@@ -1,4 +1,5 @@
 #!/bin/bash
+echo "v3.35pm"
 
 # Error handling and logging
 set -e
@@ -17,6 +18,13 @@ echo -e "${GREEN}${BOLD}Current user: $(whoami)${NC}"
 # Do not allow running as root
 if [ "$(id -u)" -eq 0 ]; then
   echo -e "${BOLD}${RED}This script must NOT be run as root. Please run as a regular user with sudo privileges. Exiting.${NC}"
+  exit 1
+fi
+
+# Check if running in home directory
+if [ "$PWD" != "$HOME" ]; then
+  echo -e "${BOLD}${RED}This script must be run from your home directory: $HOME${NC}"
+  echo -e "${BOLD}${RED}Current directory: $PWD${NC}"
   exit 1
 fi
 
@@ -63,8 +71,8 @@ fi
 echo -e "${GREEN}${BOLD}Checking Secure Boot status...${NC}"
 if ! command -v mokutil >/dev/null 2>&1; then
   echo -e "${GREEN}${BOLD}Installing mokutil...${NC}"
-  sudo apt update -y
-  sudo apt install -y mokutil
+  sudo apt update -y 2> >(grep -v "apt does not have a stable CLI interface" >&2)
+  sudo apt install -y mokutil 2> >(grep -v "apt does not have a stable CLI interface" >&2)
 fi
 SB_STATE=$(mokutil --sb-state 2>/dev/null)
 echo -e "${BLUE}${SB_STATE}${NC}"
@@ -89,10 +97,10 @@ uname -a
 echo -e "${BRIGHT_GREEN}${BOLD}---------- Install Docker Engine ----------${NC}"
 
 echo -e "${GREEN}${BOLD}sudo apt update${NC}"
-sudo apt update -y
+sudo apt update -y 2> >(grep -v "apt does not have a stable CLI interface" >&2)
 
 echo -e "${GREEN}${BOLD}sudo apt upgrade -y${NC}"
-sudo apt upgrade -y
+sudo apt upgrade -y 2> >(grep -v "apt does not have a stable CLI interface" >&2)
 
 # Check if reboot is required after upgrade
 if [ -f /var/run/reboot-required ]; then
@@ -107,10 +115,10 @@ fi
 # sudo apt upgrade -y
 
 echo -e "${GREEN}${BOLD}sudo apt install apt-transport-https ca-certificates curl software-properties-common${NC}"
-sudo apt install -y apt-transport-https ca-certificates curl software-properties-common
+sudo apt install -y apt-transport-https ca-certificates curl software-properties-common 2> >(grep -v "apt does not have a stable CLI interface" >&2)
 
 echo -e "${GREEN}${BOLD}sudo rm /usr/share/keyrings/docker-archive-keyring.gpg${NC}"
-sudo rm /usr/share/keyrings/docker-archive-keyring.gpg
+sudo rm -f /usr/share/keyrings/docker-archive-keyring.gpg
 
 echo -e "${GREEN}${BOLD}curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg${NC}"
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
@@ -119,13 +127,13 @@ echo -e "${GREEN}${BOLD}echo \"deb [arch=\$(dpkg --print-architecture) signed-by
 echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
 echo -e "${GREEN}${BOLD}sudo apt update${NC}"
-sudo apt update -y
+sudo apt update -y 2> >(grep -v "apt does not have a stable CLI interface" >&2)
 
 echo -e "${GREEN}${BOLD}apt-cache policy docker-ce${NC}"
 apt-cache policy docker-ce | while IFS= read -r line; do echo -e "${BLUE}$line${NC}"; done
 
 echo -e "${GREEN}${BOLD}sudo apt install docker-ce${NC}"
-sudo apt install -y docker-ce
+sudo apt install -y docker-ce 2> >(grep -v "apt does not have a stable CLI interface" >&2)
 
 echo -e "${GREEN}${BOLD}sudo systemctl status docker${NC}"
 sudo systemctl status docker --no-pager | while IFS= read -r line; do echo -e "${BLUE}$line${NC}"; done
@@ -147,78 +155,87 @@ docker -v | while IFS= read -r line; do echo -e "${BLUE}$line${NC}"; done
 echo -e "${BRIGHT_GREEN}${BOLD}---------- Install Nvidia Driver on Ubuntu ----------${NC}"
 
 echo -e "${GREEN}${BOLD}sudo lshw -c display${NC}"
-sudo lshw -c display | while IFS= read -r line; do echo -e "${BLUE}$line${NC}"; done
+sudo lshw -c display 2>/dev/null | while IFS= read -r line; do echo -e "${BLUE}$line${NC}"; done
 
 echo -e "${GREEN}${BOLD}sudo lshw -c video${NC}"
-sudo lshw -c video | while IFS= read -r line; do echo -e "${BLUE}$line${NC}"; done
+sudo lshw -c video 2>/dev/null | while IFS= read -r line; do echo -e "${BLUE}$line${NC}"; done
 
 echo -e "${GREEN}${BOLD}sudo apt update${NC}"
-sudo apt update -y
+sudo apt update -y 2> >(grep -v "apt does not have a stable CLI interface" >&2)
 
 # echo -e "${GREEN}${BOLD}sudo apt upgrade -y${NC}"
 # sudo apt upgrade -y
 
 echo -e "${GREEN}${BOLD}sudo apt install ubuntu-drivers-common -y${NC}"
-sudo apt install -y ubuntu-drivers-common
+sudo apt install -y ubuntu-drivers-common 2> >(grep -v "apt does not have a stable CLI interface" >&2)
 
 echo -e "${GREEN}${BOLD}ubuntu-drivers devices${NC}"
-ubuntu-drivers devices | sed 's/recommended/\x1b[32m&\x1b[0m/'
+ubuntu-drivers devices 2>/dev/null | sed 's/recommended/\x1b[32m&\x1b[0m/'
 
 echo -e "${GREEN}${BOLD}nvidia-smi --query-gpu=driver_version --format=csv,noheader && nvidia-smi | grep -i \"CUDA Version\"${NC}"
-echo -e "\033[0;32m$(nvidia-smi --query-gpu=driver_version --format=csv,noheader)\n$(nvidia-smi | grep -i \"CUDA Version\" | sed 's/$/  <=== YOUR CURRENT VERSIONS/')\033[0m"
+echo -e "\033[0;32m$(nvidia-smi --query-gpu=driver_version --format=csv,noheader 2>/dev/null)\n$(nvidia-smi 2>/dev/null | grep -i \"CUDA Version\" | sed 's/$/  <=== YOUR CURRENT VERSIONS/')\033[0m"
 
 echo -e "${GREEN}${BOLD}sudo apt update && sudo apt upgrade -y${NC}"
-sudo apt update -y && sudo apt upgrade -y
+sudo apt update -y 2> >(grep -v "apt does not have a stable CLI interface" >&2) && sudo apt upgrade -y 2> >(grep -v "apt does not have a stable CLI interface" >&2)
 
 # echo -e "${GREEN}${BOLD}sudo add-apt-repository ppa:graphics-drivers/ppa${NC}"
 # sudo add-apt-repository -y ppa:graphics-drivers/ppa
 
 echo -e "${GREEN}${BOLD}sudo add-apt-repository ppa:graphics-drivers/ppa${NC}"
-sudo add-apt-repository -y ppa:graphics-drivers/ppa
+sudo add-apt-repository -y ppa:graphics-drivers/ppa 2>/dev/null
 
 echo -e "${GREEN}${BOLD}sudo apt update${NC}"
-sudo apt update -y
+sudo apt update -y 2> >(grep -v "apt does not have a stable CLI interface" >&2)
 
 echo -e "${GREEN}${BOLD}ubuntu-drivers list${NC}"
-ubuntu-drivers list
+ubuntu-drivers list 2>/dev/null
 
 echo -e "${GREEN}${BOLD}sudo ubuntu-drivers install${NC}"
-sudo ubuntu-drivers install
+sudo ubuntu-drivers install 2>/dev/null
 
 echo -e "${GREEN}${BOLD}sudo apt install nvidia-prime${NC}"
-sudo apt install -y nvidia-prime
+sudo apt install -y nvidia-prime 2> >(grep -v "apt does not have a stable CLI interface" >&2)
 
 echo -e "${GREEN}${BOLD}sudo prime-select nvidia${NC}"
-sudo prime-select nvidia
+sudo prime-select nvidia 2>/dev/null
 
 echo -e "${GREEN}${BOLD}prime-select query${NC}"
-prime-select query
+prime-select query 2>/dev/null
 
 echo -e "${BLUE}# Skipping reboot for now${NC}"
 
 echo -e "${GREEN}${BOLD}curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg ...${NC}"
-curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg \
-  && curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list | \
-    sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
-    sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list \
-  && \
-    sudo apt-get update
+sudo rm -f /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
+curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
+
+echo -e "${GREEN}${BOLD}curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list | sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list${NC}"
+curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list | \
+  sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
+  sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+
+echo -e "${GREEN}${BOLD}sudo apt-get update${NC}"
+sudo apt-get update -y 2> >(grep -v "apt does not have a stable CLI interface" >&2)
 
 echo -e "${GREEN}${BOLD}sudo apt-get install -y nvidia-container-toolkit${NC}"
-sudo apt-get install -y nvidia-container-toolkit
+sudo apt-get install -y nvidia-container-toolkit 2> >(grep -v "apt does not have a stable CLI interface" >&2)
 
 echo -e "${GREEN}${BOLD}sudo nvidia-ctk runtime configure --runtime=docker${NC}"
-sudo nvidia-ctk runtime configure --runtime=docker
+sudo nvidia-ctk runtime configure --runtime=docker 2>/dev/null
 
 echo -e "${GREEN}${BOLD}sudo systemctl restart docker${NC}"
 sudo systemctl restart docker
 
 echo -e "${GREEN}${BOLD}nvidia-smi${NC}"
-nvidia-smi
+nvidia-smi 2>/dev/null
 
 # reserve for later:
 # sudo systemctl reboot
 
 # ---------- Summary ----------
 echo -e "${BRIGHT_GREEN}${BOLD}---------- Installation Summary ----------${NC}"
-echo -e "${GREEN}All steps completed. Please review the output above for any errors. If you installed or updated drivers or the kernel, a reboot may be required before using Docker or NVIDIA GPU features.${NC}"
+echo -e "${GREEN}All steps completed. Please review the output above for any errors.${NC}"
+echo -e "${BOLD}${RED}A reboot is required if:${NC}"
+echo -e "${RED}- You updated the NVIDIA driver (to resolve driver/library version mismatch)"
+echo -e "- You updated the kernel or systemd (to load new modules)"
+echo -e "- You want Docker group changes to take effect (to use Docker without sudo)"
+echo -e "${GREEN}After reboot, your system will be ready for Nosana node operation.${NC}"

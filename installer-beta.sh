@@ -29,12 +29,12 @@ fi
 
 # ASCII arrow before first sudo command
 echo -e "            /\\"
-echo -e "           /   \\"
-echo -e "          /      \\"
-echo -e "         /         \\"
-echo -e "        ~~~~|   |~~~~\\"
-echo -e "            |   |"
-echo -e "            |___|"
+echo -e "           /  \\"
+echo -e "          /     \\"
+echo -e "         /        \\"
+echo -e "        ~~~~|  |~~~~\\"
+echo -e "            |  |"
+echo -e "            |__|"
 
 # Capture username at the very beginning
 username=$(echo $USER)
@@ -153,9 +153,10 @@ sudo usermod -aG docker ${username}
 # sudo usermod -aG docker $username
 
 echo -e "${GREEN}${BOLD}su - \${username} -c \"groups\"${NC}"
-echo -e "          __"
-echo -e "         |  |"
-echo -e "        _|  |_"
+echo -e "           __"
+echo -e "          |  |"
+echo -e "        __|  |__"
+echo -e "       \\      /
 echo -e "        \\    /"
 echo -e "         \\  /"
 echo -e "          \\/"

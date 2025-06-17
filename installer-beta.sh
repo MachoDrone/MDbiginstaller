@@ -152,6 +152,12 @@ sudo usermod -aG docker ${username}
 # sudo usermod -aG docker $username
 
 echo -e "${GREEN}${BOLD}su - \${username} -c \"groups\"${NC}"
+echo -e "          __"
+echo -e "         |  |"
+echo -e "        _|  |_"
+echo -e "        \\    /"
+echo -e "         \\  /"
+echo -e "          \\/"
 su - $username -c "groups"
 
 echo -e "${GREEN}${BOLD}docker -v${NC}"

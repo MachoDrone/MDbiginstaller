@@ -28,11 +28,11 @@ if [ "$PWD" != "$HOME" ]; then
 fi
 
 # ASCII arrow before first sudo command
-echo -e "       ___"
-echo -e "       |   |"
-echo -e "     _ |   |_"
-echo -e "      \\     /"
-echo -e "        \\   /"
+echo -e "          ___"
+echo -e "         |   |"
+echo -e "       _ |   |_"
+echo -e "       \\     /"
+echo -e "         \\  /"
 echo -e "          \\/"
 
 # Capture username at the very beginning

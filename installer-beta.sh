@@ -1,6 +1,5 @@
 #!/bin/bash
-echo "v3.35pm"
-
+echo "v4.13pm"
 # Error handling and logging
 set -e
 RED='\033[1;31m'
@@ -27,6 +26,14 @@ if [ "$PWD" != "$HOME" ]; then
   echo -e "${BOLD}${RED}Current directory: $PWD${NC}"
   exit 1
 fi
+
+# ASCII arrow before first sudo command
+echo -e "       ___"
+echo -e "       |   |"
+echo -e "     _ |   |_"
+echo -e "      \\     /"
+echo -e "        \\   /"
+echo -e "          \\/"
 
 # Capture username at the very beginning
 username=$(echo $USER)
@@ -70,7 +77,6 @@ fi
 # Secure Boot Check (ensure mokutil is installed)
 echo -e "${GREEN}${BOLD}Checking Secure Boot status...${NC}"
 if ! command -v mokutil >/dev/null 2>&1; then
-  echo -e "${GREEN}${BOLD}Installing mokutil...${NC}"
   sudo apt update -y 2> >(grep -v "apt does not have a stable CLI interface" >&2)
   sudo apt install -y mokutil 2> >(grep -v "apt does not have a stable CLI interface" >&2)
 fi

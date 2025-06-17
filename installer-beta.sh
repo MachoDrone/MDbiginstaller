@@ -226,7 +226,7 @@ echo -e "${GREEN}${BOLD}sudo systemctl restart docker${NC}"
 sudo systemctl restart docker
 
 echo -e "${GREEN}${BOLD}nvidia-smi${NC}"
-nvidia-smi 2>/dev/null
+nvidia-smi 2>/dev/null || true
 
 # reserve for later:
 # sudo systemctl reboot

@@ -13,12 +13,14 @@ trap 'echo -e "${BOLD}${RED}An error occurred on line $LINENO. Exiting.${NC}"' E
 
 #Show logo
 clear
-echo -e "| \\ \\ \\  |"
-echo -e "|  \\ \\ \\ |"
-echo -e "| \\ \\ \\  |"
-echo -e "|  \\_\\ \\_|"
 echo -e ""
-echo -e "N O S A N A"
+echo -e ""
+echo -e "  | \\ \\ \\  |"
+echo -e "  |  \\ \\ \\ |"
+echo -e "  | \\ \\ \\  |"
+echo -e "  |  \\_\\ \\_|"
+echo -e ""
+echo -e "  N O S A N A"
 echo -e ""
 echo -e ""
 

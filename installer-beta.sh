@@ -11,6 +11,12 @@ NC='\033[0m' # No Color
 exec > >(tee -a install.log) 2>&1
 trap 'echo -e "${BOLD}${RED}An error occurred on line $LINENO. Exiting.${NC}"' ERR
 
+#Show logo
+echo -e "| \\ \\ \\  |"
+echo -e "|  \\ \\ \\ |"
+echo -e "| \\ \\ \\  |"
+echo -e "|  \\_\\ \\_|"
+
 # Show current username
 echo -e "${GREEN}${BOLD}Current user: $(whoami)${NC}"
 

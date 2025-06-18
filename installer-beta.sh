@@ -1,5 +1,5 @@
 #!/bin/bash
-echo "v5.29pm"
+echo "v5.34.5pm"
 # Error handling and logging
 set -e
 RED='\033[1;31m'
@@ -30,11 +30,11 @@ fi
 # ASCII arrow before first sudo command
 echo -e "            /\\"
 echo -e "           /  \\"
-echo -e "          /     \\"
-echo -e "         /        \\"
-echo -e "        ~~~~|  |~~~~\\"
-echo -e "            |  |"
-echo -e "            |__|"
+echo -e "          /    \\"
+echo -e "         /      \\"
+echo -e "        ~~|   |~~\\"
+echo -e "          |   |"
+echo -e "          |_ _|"
 
 # Capture username at the very beginning
 username=$(echo $USER)
@@ -153,9 +153,9 @@ sudo usermod -aG docker ${username}
 # sudo usermod -aG docker $username
 
 echo -e "${GREEN}${BOLD}su - \${username} -c \"groups\"${NC}"
-echo -e "           __"
-echo -e "          |  |"
-echo -e "        __|  |__"
+echo -e "          __"
+echo -e "         |  |"
+echo -e "       __|  |__"
 echo -e "       \\      /"
 echo -e "        \\    /"
 echo -e "         \\  /"

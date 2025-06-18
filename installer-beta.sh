@@ -12,6 +12,7 @@ exec > >(tee -a install.log) 2>&1
 trap 'echo -e "${BOLD}${RED}An error occurred on line $LINENO. Exiting.${NC}"' ERR
 
 #Show logo
+clear
 echo -e "| \\ \\ \\  |"
 echo -e "|  \\ \\ \\ |"
 echo -e "| \\ \\ \\  |"
@@ -38,12 +39,12 @@ if [ "$PWD" != "$HOME" ]; then
 fi
 
 # ASCII arrow before first sudo command
-echo -e "              /\\"
-echo -e "             /  \\"
-echo -e "            /    \\"
-echo -e "           /__  __\\"
-echo -e "             |  |"
-echo -e "             |__|"
+#echo -e "              /\\"
+#echo -e "             /  \\"
+#echo -e "            /    \\"
+#echo -e "           /__  __\\"
+#echo -e "             |  |"
+#echo -e "             |__|"
 
 # Capture username at the very beginning
 username=$(echo $USER)

@@ -1,5 +1,5 @@
 #!/bin/bash
-echo "v6.11am"
+
 # Error handling and logging
 set -e
 RED='\033[1;31m'
@@ -16,10 +16,14 @@ echo -e "| \\ \\ \\  |"
 echo -e "|  \\ \\ \\ |"
 echo -e "| \\ \\ \\  |"
 echo -e "|  \\_\\ \\_|"
+echo -e ""
+echo -e "N O S A N A"
+echo -e ""
+echo -e ""
 
 # Show current username
 echo -e "${GREEN}${BOLD}Current user: $(whoami)${NC}"
-
+sleep 5
 # Do not allow running as root
 if [ "$(id -u)" -eq 0 ]; then
   echo -e "${BOLD}${RED}This script must NOT be run as root. Please run as a regular user with sudo privileges. Exiting.${NC}"

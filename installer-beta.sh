@@ -1,5 +1,5 @@
 #!/bin/bash
-echo "v6.03am"
+echo "v6.04am"
 # Error handling and logging
 set -e
 RED='\033[1;31m'
@@ -31,7 +31,7 @@ fi
 echo -e "              /\\"
 echo -e "             /  \\"
 echo -e "            /    \\"
-echo -e "           /__   __\"
+echo -e "           /__  __\\"
 echo -e "             |  |"
 echo -e "             |__|"
 

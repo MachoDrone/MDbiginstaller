@@ -1,5 +1,5 @@
 #!/bin/bash
-echo "v6.07am"
+echo "v6.11am"
 # Error handling and logging
 set -e
 RED='\033[1;31m'

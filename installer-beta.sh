@@ -32,11 +32,10 @@ if [ "$(id -u)" -eq 0 ]; then
   exit 1
 fi
 
-# Check if running in home directory
+# Ensure running in home directory
 if [ "$PWD" != "$HOME" ]; then
-  echo -e "${BOLD}${RED}This script must be run from your home directory: $HOME${NC}"
-  echo -e "${BOLD}${RED}Current directory: $PWD${NC}"
-  exit 1
+  echo -e "${BOLD}${RED}Switching to your home directory: $HOME${NC}"
+  cd "$HOME"
 fi
 
 # Capture username at the very beginning
@@ -107,7 +106,6 @@ uname -a
 
 echo -e ""
 echo -e "${BRIGHT_GREEN}${BOLD}---------- Install Docker Engine ----------${NC}"
-
 echo -e ""
 echo -e "${GREEN}${BOLD}sudo apt update${NC}"
 sudo apt update -y 2> >(grep -v "apt does not have a stable CLI interface" >&2)
@@ -216,10 +214,15 @@ sudo apt update -y 2> >(grep -v "apt does not have a stable CLI interface" >&2)
 echo -e ""
 echo -e "${GREEN}${BOLD}ubuntu-drivers list${NC}"
 ubuntu-drivers list 2>/dev/null
-
 echo -e ""
-echo -e "${GREEN}${BOLD}sudo ubuntu-drivers install${NC}"
-sudo ubuntu-drivers install 2>/dev/null
+echo -e "${GREEN}${BOLD}Detecting recommended NVIDIA driver...${NC}"
+recommended_driver=$(ubuntu-drivers devices 2>/dev/null | awk '/recommended/ {for(i=1;i<=NF;i++) if ($i ~ /^nvidia-driver-[0-9]+/) print $i}' | head -n1)
+if [ -n "$recommended_driver" ]; then
+  echo -e "${GREEN}${BOLD}Installing recommended driver: $recommended_driver${NC}"
+  sudo apt install -y "$recommended_driver"
+else
+  echo -e "${RED}${BOLD}Could not detect a recommended NVIDIA driver. Skipping explicit install.${NC}"
+fi
 
 # Only install nvidia-prime if hybrid graphics detected (Intel + NVIDIA)
 if lspci | grep -i 'VGA' | grep -qi 'Intel'; then
@@ -269,7 +272,6 @@ echo "$nvidia_smi_output"
 if echo "$nvidia_smi_output" | grep -q "Driver/library version mismatch"; then
   echo -e "${BOLD}${RED}NVIDIA driver/library version mismatch detected. Please reboot to complete the driver update.${NC}"
 fi
-
 echo -e ""
 echo -e "${BRIGHT_GREEN}${BOLD}---------- Installation Summary ----------${NC}"
 echo -e "${GREEN}All steps completed. Please review the output above for any errors.${NC}"

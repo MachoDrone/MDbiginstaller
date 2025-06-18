@@ -24,7 +24,7 @@ echo -e ""
 
 # Show current username
 echo -e "${GREEN}${BOLD}Current user: $(whoami)${NC}"
-Prepare for a password prompt.
+echo -e "Prepare for a password prompt."
 sleep 5
 # Do not allow running as root
 if [ "$(id -u)" -eq 0 ]; then

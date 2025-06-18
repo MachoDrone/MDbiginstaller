@@ -38,18 +38,10 @@ if [ "$PWD" != "$HOME" ]; then
   exit 1
 fi
 
-# ASCII arrow before first sudo command
-#echo -e "              /\\"
-#echo -e "             /  \\"
-#echo -e "            /    \\"
-#echo -e "           /__  __\\"
-#echo -e "             |  |"
-#echo -e "             |__|"
-
 # Capture username at the very beginning
 username=$(echo $USER)
 
-# ---------- Checking Ubuntu Version ---------- (@https://docs.nosana.com/hosts/grid-ubuntu.html )
+# ---------- Checking Ubuntu Version ----------
 echo -e "${BRIGHT_GREEN}${BOLD}---------- Checking Ubuntu Version ----------${NC}"
 
 # Block WSL
@@ -110,7 +102,7 @@ cat /etc/os-release
 echo -e "${GREEN}${BOLD}uname -a${NC}"
 uname -a
 
-# ---------- Install Docker Engine ---------- (@https://docs.nosana.com/hosts/grid-ubuntu.html#docker )
+# ---------- Install Docker Engine ----------
 echo -e "${BRIGHT_GREEN}${BOLD}---------- Install Docker Engine ----------${NC}"
 
 echo -e "${GREEN}${BOLD}sudo apt update${NC}"
@@ -124,12 +116,6 @@ if [ -f /var/run/reboot-required ]; then
   echo -e "${BOLD}${RED}A system reboot is required to complete updates (likely a kernel update). Please reboot and re-run this script.${NC}"
   exit 1
 fi
-
-# Commented redundant updates/upgrades for reference
-# echo -e "${GREEN}${BOLD}sudo apt update${NC}"
-# sudo apt update -y
-# echo -e "${GREEN}${BOLD}sudo apt upgrade -y${NC}"
-# sudo apt upgrade -y
 
 echo -e "${GREEN}${BOLD}sudo apt install apt-transport-https ca-certificates curl software-properties-common${NC}"
 sudo apt install -y apt-transport-https ca-certificates curl software-properties-common 2> >(grep -v "apt does not have a stable CLI interface" >&2)
@@ -159,9 +145,6 @@ sudo systemctl status docker --no-pager | while IFS= read -r line; do echo -e "$
 echo -e "${GREEN}${BOLD}sudo usermod -aG docker \${username}${NC}"
 sudo usermod -aG docker ${username}
 
-# echo -e "${GREEN}${BOLD}sudo usermod -aG docker \$username${NC}"
-# sudo usermod -aG docker $username
-
 echo -e "${GREEN}${BOLD}su - \${username} -c \"groups\"${NC}"
 echo -e "          __"
 echo -e "         |  |"
@@ -176,7 +159,7 @@ su - $username -c "groups"
 echo -e "${GREEN}${BOLD}docker -v${NC}"
 docker -v | while IFS= read -r line; do echo -e "${BLUE}$line${NC}"; done
 
-# ---------- Install Nvidia Driver on Ubuntu ---------- (@https://discord.com/channels/236263424676331521/1359868195443441894/1359868195443441894 )
+# ---------- Install Nvidia Driver on Ubuntu ----------
 echo -e "${BRIGHT_GREEN}${BOLD}---------- Install Nvidia Driver on Ubuntu ----------${NC}"
 
 echo -e "${GREEN}${BOLD}sudo lshw -c display${NC}"
@@ -188,23 +171,17 @@ sudo lshw -c video 2>/dev/null | while IFS= read -r line; do echo -e "${BLUE}$li
 echo -e "${GREEN}${BOLD}sudo apt update${NC}"
 sudo apt update -y 2> >(grep -v "apt does not have a stable CLI interface" >&2)
 
-# echo -e "${GREEN}${BOLD}sudo apt upgrade -y${NC}"
-# sudo apt upgrade -y
-
 echo -e "${GREEN}${BOLD}sudo apt install ubuntu-drivers-common -y${NC}"
 sudo apt install -y ubuntu-drivers-common 2> >(grep -v "apt does not have a stable CLI interface" >&2)
 
 echo -e "${GREEN}${BOLD}ubuntu-drivers devices${NC}"
-ubuntu-drivers devices 2>/dev/null | sed 's/recommended/\x1b[32m&\x1b[0m/'
+ubuntu-drivers devices 2>/dev/null | sed 's/recommended/\\x1b[32m&\\x1b[0m/'
 
 echo -e "${GREEN}${BOLD}nvidia-smi --query-gpu=driver_version --format=csv,noheader && nvidia-smi | grep -i \"CUDA Version\"${NC}"
 echo -e "\033[0;32m$(nvidia-smi --query-gpu=driver_version --format=csv,noheader 2>/dev/null)\n$(nvidia-smi 2>/dev/null | grep -i \"CUDA Version\" | sed 's/$/  <=== YOUR CURRENT VERSIONS/')\033[0m"
 
 echo -e "${GREEN}${BOLD}sudo apt update && sudo apt upgrade -y${NC}"
 sudo apt update -y 2> >(grep -v "apt does not have a stable CLI interface" >&2) && sudo apt upgrade -y 2> >(grep -v "apt does not have a stable CLI interface" >&2)
-
-# echo -e "${GREEN}${BOLD}sudo add-apt-repository ppa:graphics-drivers/ppa${NC}"
-# sudo add-apt-repository -y ppa:graphics-drivers/ppa
 
 echo -e "${GREEN}${BOLD}sudo add-apt-repository ppa:graphics-drivers/ppa${NC}"
 sudo add-apt-repository -y ppa:graphics-drivers/ppa 2>/dev/null
@@ -218,14 +195,15 @@ ubuntu-drivers list 2>/dev/null
 echo -e "${GREEN}${BOLD}sudo ubuntu-drivers install${NC}"
 sudo ubuntu-drivers install 2>/dev/null
 
-echo -e "${GREEN}${BOLD}sudo apt install nvidia-prime${NC}"
-sudo apt install -y nvidia-prime 2> >(grep -v "apt does not have a stable CLI interface" >&2)
-
-echo -e "${GREEN}${BOLD}sudo prime-select nvidia${NC}"
-sudo prime-select nvidia 2>/dev/null
-
-echo -e "${GREEN}${BOLD}prime-select query${NC}"
-prime-select query 2>/dev/null
+# Only install nvidia-prime if hybrid graphics detected (Intel + NVIDIA)
+if lspci | grep -i 'VGA' | grep -qi 'Intel'; then
+  echo -e "${GREEN}${BOLD}Hybrid graphics detected, installing nvidia-prime${NC}"
+  sudo apt install -y nvidia-prime 2> >(grep -v "apt does not have a stable CLI interface" >&2)
+  sudo prime-select nvidia 2>/dev/null
+  prime-select query 2>/dev/null
+else
+  echo -e "${GREEN}${BOLD}No hybrid graphics detected, skipping nvidia-prime${NC}"
+fi
 
 echo -e "${BLUE}# Skipping reboot for now${NC}"
 
@@ -251,10 +229,11 @@ echo -e "${GREEN}${BOLD}sudo systemctl restart docker${NC}"
 sudo systemctl restart docker
 
 echo -e "${GREEN}${BOLD}nvidia-smi${NC}"
-nvidia-smi 2>/dev/null || true
-
-# reserve for later:
-# sudo systemctl reboot
+nvidia_smi_output=$(nvidia-smi 2>&1 || true)
+echo "$nvidia_smi_output"
+if echo "$nvidia_smi_output" | grep -q "Driver/library version mismatch"; then
+  echo -e "${BOLD}${RED}NVIDIA driver/library version mismatch detected. Please reboot to complete the driver update.${NC}"
+fi
 
 # ---------- Summary ----------
 echo -e "${BRIGHT_GREEN}${BOLD}---------- Installation Summary ----------${NC}"
@@ -264,3 +243,4 @@ echo -e "${RED}- You updated the NVIDIA driver (to resolve driver/library versio
 echo -e "- You updated the kernel or systemd (to load new modules)"
 echo -e "- You want Docker group changes to take effect (to use Docker without sudo)"
 echo -e "${GREEN}After reboot, your system will be ready for Nosana node operation.${NC}"
+echo -e "${GREEN}You may run 'sudo apt autoremove' to clean up unused packages.${NC}"

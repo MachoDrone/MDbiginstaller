@@ -1,5 +1,5 @@
 #!/bin/bash
-echo "v6.12pm"
+echo "v5.29pm"
 # Error handling and logging
 set -e
 RED='\033[1;31m'
@@ -156,7 +156,7 @@ echo -e "${GREEN}${BOLD}su - \${username} -c \"groups\"${NC}"
 echo -e "           __"
 echo -e "          |  |"
 echo -e "        __|  |__"
-echo -e "       \\      /
+echo -e "       \\      /"
 echo -e "        \\    /"
 echo -e "         \\  /"
 echo -e "          \\/"

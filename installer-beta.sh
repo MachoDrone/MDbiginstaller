@@ -1,5 +1,5 @@
 #!/bin/bash
-echo "v5.34.5pm"
+echo "v5.56pm"
 # Error handling and logging
 set -e
 RED='\033[1;31m'
@@ -160,6 +160,7 @@ echo -e "       \\      /"
 echo -e "        \\    /"
 echo -e "         \\  /"
 echo -e "          \\/"
+echo -e "[sudo] password for $USER"
 su - $username -c "groups"
 
 echo -e "${GREEN}${BOLD}docker -v${NC}"

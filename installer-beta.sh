@@ -285,10 +285,12 @@ echo -e "- You updated the kernel or systemd (to load new modules)"
 echo -e "- You want Docker group changes to take effect (to use Docker without sudo)"
 echo -e "${GREEN}After reboot, your system will be ready for Nosana node operation.${NC}"
 echo -e "${GREEN}You may run 'sudo apt autoremove' to clean up unused packages.${NC}"
-sudo mkdir /home/md/.nosana
-sudo chown root:root /home/md/.nosana
-sudo chmod 755 /home/md/.nosana
-sudo touch /home/md/.nosana/nosana_key.json
-sudo chown root:root /home/md/.nosana/nosana_key.json
-sudo chmod 644 /home/md/.nosana/nosana_key.json
+#sudo rm -rf "$HOME/.nosana" 2>/dev/null
+sudo mkdir -p "$HOME/.nosana"
+sudo chown root:root "$HOME/.nosana"
+sudo chmod 755 "$HOME/.nosana"
+#sudo rm -f "$HOME/.nosana/nosana_key.json" 2>/dev/null
+sudo touch "$HOME/.nosana/nosana_key.json"
+sudo chown root:root "$HOME/.nosana/nosana_key.json"
+sudo chmod 644 "$HOME/.nosana/nosana_key.json"
 sudo systemctl reboot

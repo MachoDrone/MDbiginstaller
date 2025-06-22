@@ -1,3 +1,4 @@
+# run with wget -O sme.py https://raw.githubusercontent.com/MachoDrone/MDbiginstaller/refs/heads/main/sme.py && python3 sme.py
 # DO NOT DELETE THIS COMMENT.
 # =============================================================================
 # STRICT PODMAN VERSION DETECTION LOGIC & DYNAMIC LOGIN LOGIC -- READ THIS BEFORE EDITING!

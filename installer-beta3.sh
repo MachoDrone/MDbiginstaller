@@ -3,7 +3,7 @@
 # run with: curl -sSL https://raw.githubusercontent.com/MachoDrone/MDbiginstaller/refs/heads/main/installer-beta3.sh | bash
 
 # Version and timestamp - increment on changes
-echo "Version: 0.00.5 - 13:08:00 20JUL25"
+echo "Version: 0.00.6 - 15:26:11 20JUL25"
 
 # Error handling and logging
 set -euo pipefail
@@ -91,13 +91,14 @@ if [ $SUPPORT_LAPTOPS -eq 0 ] && [[ "$CHASSIS" =~ laptop|convertible|tablet ]]; 
   echo -e "${RED}${BOLD}Laptops not supported.${NC}"
   exit 1
 fi
-GPU_INFO=$(sudo lshw -c display 2>/dev/null | grep -i product | awk -F: '{print $2}' | sed 's/^\s*//')
-if [[ $SUPPORT_LAPTOPS -eq 0 && "$GPU_INFO" =~ Mobile|M|Laptop ]]; then
-  echo -e "${RED}${BOLD}Mobile GPUs not supported.${NC}"
+if ! lspci | grep -iq nvidia; then
+  echo -e "${RED}${BOLD}No NVIDIA GPU detected.${NC}"
   exit 1
 fi
-if ! echo "$GPU_INFO" | grep -iq nvidia; then
-  echo -e "${RED}${BOLD}No NVIDIA GPU detected.${NC}"
+GPU_INFO=$(sudo lshw -c display 2>/dev/null | grep -i product | awk -F: '{print $2}' | sed 's/^\s*//' || lspci | grep -i nvidia | awk -F: '{print $3}' | sed 's/^\s*//')
+echo "GPU_INFO: $GPU_INFO"
+if [[ $SUPPORT_LAPTOPS -eq 0 && "$GPU_INFO" =~ Mobile|M|Laptop ]]; then
+  echo -e "${RED}${BOLD}Mobile GPUs not supported.${NC}"
   exit 1
 fi
 

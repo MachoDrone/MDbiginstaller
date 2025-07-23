@@ -185,10 +185,29 @@ fi
 echo "bash <(wget -qO- https://nosana.com/start.sh)" > ~/samplex.sh
 chmod +x ~/samplex.sh
 
+# Create wallet before reboot
+# Test Nosana init without reboot (start-based append with 1s kill, refined permissions)
+echo -e "${YELLOW}Initializing Nosana to create ~/.nosana/ and nosana_key.json with correct ownership.${NC}"
+mkdir -p ~/.nosana ~/.nosana/podman
+docker run --rm -v ~/.nosana:/root/.nosana nosana/nosana-cli:latest node start --network mainnet &
+pid=$!
+sleep 1 && docker stop $(docker ps -q -f "ancestor=nosana/nosana-cli:latest") || true
+wait $pid 2>/dev/null || true
+if [ -f ~/.nosana/nosana_key.json ]; then
+  sudo chown -R $USER:$USER ~/.nosana/
+  find ~/.nosana -type d -exec chmod 755 {} \;
+  find ~/.nosana -type f -exec chmod 644 {} \;
+  echo -e "${GREEN}~/.nosana/ and nosana_key.json created with ownership and correct permissions fixed.${NC}"
+else
+  echo -e "${RED}~/.nosana/ or nosana_key.json not created—check log for errors.${NC}"
+fi
+echo -e "${YELLOW}Reboot recommended to activate Docker group for full runtime.${NC}"
+
 # Summary
 echo -e "${BRIGHT_GREEN}${BOLD}Installation complete. Review ~/nosana-install.log for details.${NC}"
 if [ $REBOOT_NEEDED -eq 1 ]; then
   echo -e "${YELLOW}Reboot required for full stability (kernel/drivers/Docker group).${NC}"
 fi
 echo -e "${GREEN}After reboot, run '~/samplex.sh' as non-root (equivalent to Nosana join).${NC}"
+
 # sudo reboot

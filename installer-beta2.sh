@@ -26,16 +26,10 @@ echo -e "  N O S A N A${NC}"
 echo -e ""
 echo -e ""
 
-# Show current username (always correct, even if run with sudo)
-if [ -n "$SUDO_USER" ]; then
-  real_user="$SUDO_USER"
-else
-  real_user="$(whoami)"
-fi
+# Show current username
 echo -e "Prepare for a password prompt."
-echo -e "${GREEN}${BOLD}Current user: $real_user${NC}"
+echo -e "${GREEN}${BOLD}Current user: $(whoami)${NC}"
 sleep 5
-
 # Do not allow running as root
 if [ "$(id -u)" -eq 0 ]; then
   echo -e "${BOLD}${RED}This script must NOT be run as root. Please run as a regular user with sudo privileges. Exiting.${NC}"
@@ -49,7 +43,7 @@ if [ "$PWD" != "$HOME" ]; then
 fi
 
 # Capture username at the very beginning
-username="$real_user"
+username=$(echo $USER)
 
 echo -e ""
 echo -e "${BRIGHT_GREEN}${BOLD}---------- Checking Ubuntu Version ----------${NC}"
@@ -175,7 +169,7 @@ echo -e "       \\      /"
 echo -e "        \\    /"
 echo -e "         \\  /"
 echo -e "          \\/"
-echo -e "[sudo] password for $username"
+echo -e "[sudo] password for $USER"
 su - $username -c "groups"
 
 echo -e ""
@@ -252,6 +246,7 @@ echo -e ""
 echo -e "${GREEN}${BOLD}curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg ...${NC}"
 sudo rm -f /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
 curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
+sudo chmod 644 /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
 
 echo -e ""
 echo -e "${GREEN}${BOLD}curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list | sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list${NC}"
@@ -291,3 +286,5 @@ echo -e "- You updated the kernel or systemd (to load new modules)"
 echo -e "- You want Docker group changes to take effect (to use Docker without sudo)"
 echo -e "${GREEN}After reboot, your system will be ready for Nosana node operation.${NC}"
 echo -e "${GREEN}You may run 'sudo apt autoremove' to clean up unused packages.${NC}"
+ 
+sudo systemctl reboot
